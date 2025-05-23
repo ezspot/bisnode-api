@@ -39,10 +39,34 @@ go run cmd/api/main.go
 
 The API will be available at `http://localhost:8080`
 
+## API Documentation
+
+The API is documented using Swagger/OpenAPI. You can access the interactive documentation at:
+
+```
+http://localhost:8080/swagger/index.html
+```
+
 ## API Endpoints
+
+All endpoints are prefixed with `/api/v1`.
+
+### Authentication
+
+All endpoints require Basic Authentication. Include your credentials in the `Authorization` header:
+
+```
+Authorization: Basic <base64-encoded-username:password>
+```
 
 ### Search for a Person by Mobile Number
 
+#### GET Request
+```http
+GET http://localhost:8080/api/v1/directory/persons/search?mobileNumber=12345678
+```
+
+#### POST Request
 ```http
 POST http://localhost:8080/api/v1/directory/persons/search
 Content-Type: application/json
@@ -54,12 +78,12 @@ Content-Type: application/json
 
 ### Search for an Organization by Number
 
-Using query parameter:
+#### GET Request
 ```http
-GET http://localhost:8080/api/v1/directory/organizations/search?orgNo=123456789
+GET http://localhost:8080/api/v1/directory/organizations/search?organizationNumber=123456789
 ```
 
-Or using JSON body:
+#### POST Request
 ```http
 POST http://localhost:8080/api/v1/directory/organizations/search
 Content-Type: application/json
@@ -71,17 +95,17 @@ Content-Type: application/json
 
 ### Search for a Motor Vehicle
 
-Search by license number (GET with query parameter):
+#### GET Request (License Number)
 ```http
 GET http://localhost:8080/api/v1/motor-vehicles/search?licenseNumber=AB12345
 ```
 
-Search by VIN (GET with query parameter):
+#### GET Request (VIN)
 ```http
 GET http://localhost:8080/api/v1/motor-vehicles/search?vin=WBAKG7C5XBE123456
 ```
 
-Search by license number or VIN (POST with JSON body):
+#### POST Request (JSON Body)
 ```http
 POST http://localhost:8080/api/v1/motor-vehicles/search
 Content-Type: application/json
@@ -237,14 +261,45 @@ Content-Type: application/json
 
 Other Bisnode API endpoints can be implemented on request. Please contact support for more information.
 
+## API Documentation
+
+This project includes Swagger/OpenAPI documentation that's automatically generated from the code. To access the interactive API documentation:
+
+1. Start the server:
+   ```bash
+   go run cmd/api/main.go
+   ```
+
+2. Open your browser and navigate to:
+   ```
+   http://localhost:8080/swagger/index.html
+   ```
+
+The Swagger UI provides:
+- Interactive API documentation
+- Try-it-out functionality for all endpoints
+- Request/response schemas
+- Authentication requirements
+
 ## Building
 
 ```bash
+# Install Swag CLI (if not already installed)
+go install github.com/swaggo/swag/cmd/swag@latest
+
+# Generate Swagger documentation
+swag init -g cmd/api/main.go
+
 # Build for current platform
 go build -o bin/api cmd/api/main.go
 
 # Cross-compile for Linux
 GOOS=linux GOARCH=amd64 go build -o bin/api-linux-amd64 cmd/api/main.go
+```
+
+After making changes to the API, remember to regenerate the Swagger documentation:
+```bash
+swag init -g cmd/api/main.go
 ```
 
 ## License

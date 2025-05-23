@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "bisnode/docs"
 	"bisnode/internal/config"
 	"bisnode/internal/handlers"
 	"bisnode/internal/routes"
@@ -12,8 +13,23 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// @title           Bisnode API
+// @version         1.0
+// @description     A Go service that provides an HTTP API for searching Bisnode data.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.basic  BasicAuth
 func main() {
 	// Initialize configuration
 	cfg, err := config.Load()
@@ -34,8 +50,27 @@ func main() {
 
 	// Setup router
 	mux := http.NewServeMux()
+
+	// Register routes
 	routes.RegisterDirectoryRoutes(mux, directoryHandler)
 	routes.RegisterMotorVehicleRoutes(mux, motorVehicleHandler)
+
+	// Swagger documentation
+	docURL := "/swagger/doc.json"
+	mux.Handle("/swagger/", httpSwagger.Handler(
+		httpSwagger.URL(docURL), // The url pointing to API definition
+		httpSwagger.DeepLinking(true),
+		httpSwagger.DocExpansion("none"),
+		httpSwagger.DomID("swagger-ui"),
+		httpSwagger.PersistAuthorization(true),
+	))
+
+	// Serve the swagger.json file
+	mux.HandleFunc(docURL, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		http.ServeFile(w, r, "./docs/swagger.json")
+	})
 
 	router := mux
 

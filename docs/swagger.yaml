@@ -1,0 +1,153 @@
+basePath: /api/v1
+definitions:
+  handlers.ErrorResponse:
+    properties:
+      error:
+        description: The error message
+        type: string
+    type: object
+  handlers.SearchOrganizationRequest:
+    properties:
+      organizationNumber:
+        type: string
+    type: object
+  handlers.SearchPersonRequest:
+    properties:
+      mobileNumber:
+        type: string
+    type: object
+  handlers.SearchRequest:
+    properties:
+      licenseNumber:
+        type: string
+      vin:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: A Go service that provides an HTTP API for searching Bisnode data.
+  termsOfService: http://swagger.io/terms/
+  title: Bisnode API
+  version: "1.0"
+paths:
+  /api/v1/directory/organizations/search:
+    post:
+      consumes:
+      - application/json
+      description: Search for an organization using its organization number with JSON
+        body
+      parameters:
+      - description: Search parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SearchOrganizationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Search for an organization by organization number (POST)
+      tags:
+      - Directory
+  /api/v1/directory/persons/search:
+    post:
+      consumes:
+      - application/json
+      description: Search for a person using their mobile number with JSON body
+      parameters:
+      - description: Search parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SearchPersonRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Search for a person by mobile number (POST)
+      tags:
+      - Directory
+  /api/v1/motor-vehicles/search:
+    post:
+      consumes:
+      - application/json
+      description: Search for motor vehicle information using either license number
+        or VIN with JSON body
+      parameters:
+      - description: Search parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SearchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Search for a motor vehicle by license number or VIN (POST)
+      tags:
+      - Motor Vehicles
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
