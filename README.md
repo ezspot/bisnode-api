@@ -1,6 +1,13 @@
-# Bisnode Directory Search API
+# Bisnode API Client
 
-A Go service that provides an HTTP API for searching person and company information using Bisnode's Directory Search API. The service supports searching by mobile number for individuals and by organization number for companies.
+A Go client for interacting with the Bisnode API.
+
+## Features
+
+- Search for persons by mobile number
+- Search for organizations by organization number
+- Search for motor vehicles by license number or VIN
+- Additional features available on request for companies.
 
 ## Prerequisites
 
@@ -182,12 +189,12 @@ curl -X GET http://localhost:8080/health
 
 ## Configuration
 
-Create a `config.json` file in the root directory:
+Create a `config.json` file in the root directory based on the `config.example.json` template:
 
 ```json
 {
   "bisnode": {
-    "base_url": "https://apps.bisnode.no/api",
+    "base_url": "https://api.bisnode.no",
     "client_id": "your_username_here",
     "client_secret": "your_password_here"
   }
@@ -195,9 +202,40 @@ Create a `config.json` file in the root directory:
 ```
 
 Or use environment variables:
-- `BISNODE_BASE_URL`
+- `BISNODE_BASE_URL` (default: `https://api.bisnode.no`)
 - `BISNODE_CLIENT_ID`
 - `BISNODE_CLIENT_SECRET`
+
+Note: Ensure your account has access to the specific Bisnode API services you intend to use.
+
+## Usage Examples
+
+### Search for a Motor Vehicle
+
+Search by license number (GET):
+```http
+GET http://localhost:8080/api/v1/motor-vehicles/search?licenseNumber=AB12345
+```
+
+Search by VIN (GET):
+```http
+GET http://localhost:8080/api/v1/motor-vehicles/search?vin=WBAKG7C5XBE123456
+```
+
+Search using POST with JSON body:
+```http
+POST http://localhost:8080/api/v1/motor-vehicles/search
+Content-Type: application/json
+
+{
+  "licenseNumber": "AB12345"
+  // or "vin": "WBAKG7C5XBE123456"
+}
+```
+
+### Additional Features
+
+Other Bisnode API endpoints can be implemented on request. Please contact support for more information.
 
 ## Building
 
