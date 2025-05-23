@@ -8,6 +8,7 @@ A Go client for interacting with the Bisnode API.
 - Search for organizations by organization number
 - Search for motor vehicles by license number or VIN
 - Additional features available on request for companies.
+- Swagger documentation
 
 ## Prerequisites
 
