@@ -1,6 +1,6 @@
-# Bisnode Person Search API
+# Bisnode Directory Search API
 
-A Go service that provides an HTTP API for searching person information using Bisnode's API.
+A Go service that provides an HTTP API for searching person and company information using Bisnode's Directory Search API. The service supports searching by mobile number for individuals and by organization number for companies.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ A Go service that provides an HTTP API for searching person information using Bi
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd bisnode-person-search
+   cd bisnode-directory-search
    ```
 
 2. Update the configuration:
@@ -34,14 +34,31 @@ The API will be available at `http://localhost:8080`
 
 ## API Endpoints
 
-### Search for a Person
+### Search for a Person by Mobile Number
 
 ```http
-POST /api/v1/persons/search
+POST /api/v1/directory/persons/search
 Content-Type: application/json
 
 {
   "mobileNumber": "12345678"
+}
+```
+
+### Search for an Organization by Number
+
+Using query parameter:
+```http
+GET /api/v1/directory/organizations/search?orgNo=123456789
+```
+
+Or using JSON body:
+```http
+POST /api/v1/directory/organizations/search
+Content-Type: application/json
+
+{
+  "organizationNumber": "123456789"
 }
 ```
 
@@ -51,9 +68,48 @@ Content-Type: application/json
 GET /health
 ```
 
+## Example Usage
+
+### Using cURL
+
+```bash
+# Search person by mobile number
+curl -X POST http://localhost:8080/api/v1/directory/persons/search \
+  -H "Content-Type: application/json" \
+  -d '{"mobileNumber":"12345678"}'
+
+# Search organization by number (query param)
+curl -X GET "http://localhost:8080/api/v1/directory/organizations/search?orgNo=123456789"
+
+# Search organization by number (JSON body)
+curl -X POST http://localhost:8080/api/v1/directory/organizations/search \
+  -H "Content-Type: application/json" \
+  -d '{"organizationNumber":"123456789"}'
+```
+
+### Using PowerShell
+
+```powershell
+# Search person by mobile number
+irm -Uri "http://localhost:8080/api/v1/directory/persons/search" `
+  -Method Post `
+  -Body '{"mobileNumber":"12345678"}' `
+  -ContentType "application/json"
+
+# Search organization by number (query param)
+irm -Uri "http://localhost:8080/api/v1/directory/organizations/search?orgNo=123456789" `
+  -Method Get
+
+# Search organization by number (JSON body)
+irm -Uri "http://localhost:8080/api/v1/directory/organizations/search" `
+  -Method Post `
+  -Body '{"organizationNumber":"123456789"}' `
+  -ContentType "application/json"
+```
+
 ## Configuration
 
-The application is configured using `config.json`:
+Create a `config.json` file in the root directory:
 
 ```json
 {
@@ -65,18 +121,19 @@ The application is configured using `config.json`:
 }
 ```
 
-## Environment Variables
-
-For production, you can also use environment variables:
-
+Or use environment variables:
 - `BISNODE_BASE_URL`
 - `BISNODE_CLIENT_ID`
 - `BISNODE_CLIENT_SECRET`
 
-## Building for Production
+## Building
 
 ```bash
+# Build for current platform
 go build -o bin/api cmd/api/main.go
+
+# Cross-compile for Linux
+GOOS=linux GOARCH=amd64 go build -o bin/api-linux-amd64 cmd/api/main.go
 ```
 
 ## License

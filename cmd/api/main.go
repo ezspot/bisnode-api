@@ -4,7 +4,7 @@ import (
 	"bisnode/internal/config"
 	"bisnode/internal/handlers"
 	"bisnode/internal/routes"
-	bisnode "bisnode/internal/services/bisnode"
+	bisnodeservice "bisnode/internal/services/bisnode"
 	"context"
 	"log"
 	"net/http"
@@ -21,17 +21,20 @@ func main() {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
-	// Initialize Bisnode client
-	bisnodeClient := bisnode.NewClient(&cfg.Bisnode)
+	// Initialize Bisnode Directory client
+	directoryClient := bisnodeservice.NewDirectoryClient(&cfg.Bisnode)
+	
+	// Initialize directory service
+	directoryService := bisnodeservice.NewDirectoryService(directoryClient)
 
-	// Initialize services
-	personService := bisnode.NewPersonService(bisnodeClient)
-
-	// Initialize handlers
-	handler := handlers.NewHandler(personService)
+	// Initialize directory handler
+	directoryHandler := handlers.NewDirectoryHandler(directoryService)
 
 	// Setup router
-	router := routes.NewRouter(handler)
+	mux := http.NewServeMux()
+	routes.RegisterDirectoryRoutes(mux, directoryHandler)
+	
+	router := mux
 
 	// Create HTTP server
 	srv := &http.Server{
