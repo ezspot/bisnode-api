@@ -37,7 +37,7 @@ The API will be available at `http://localhost:8080`
 ### Search for a Person by Mobile Number
 
 ```http
-POST /api/v1/directory/persons/search
+POST http://localhost:8080/api/v1/directory/persons/search
 Content-Type: application/json
 
 {
@@ -49,12 +49,12 @@ Content-Type: application/json
 
 Using query parameter:
 ```http
-GET /api/v1/directory/organizations/search?orgNo=123456789
+GET http://localhost:8080/api/v1/directory/organizations/search?orgNo=123456789
 ```
 
 Or using JSON body:
 ```http
-POST /api/v1/directory/organizations/search
+POST http://localhost:8080/api/v1/directory/organizations/search
 Content-Type: application/json
 
 {
@@ -62,10 +62,33 @@ Content-Type: application/json
 }
 ```
 
+### Search for a Motor Vehicle
+
+Search by license number (GET with query parameter):
+```http
+GET http://localhost:8080/api/v1/motor-vehicles/search?licenseNumber=AB12345
+```
+
+Search by VIN (GET with query parameter):
+```http
+GET http://localhost:8080/api/v1/motor-vehicles/search?vin=WBAKG7C5XBE123456
+```
+
+Search by license number or VIN (POST with JSON body):
+```http
+POST http://localhost:8080/api/v1/motor-vehicles/search
+Content-Type: application/json
+
+{
+  "licenseNumber": "AB12345"
+  // or "vin": "WBAKG7C5XBE123456"
+}
+```
+
 ### Health Check
 
 ```http
-GET /health
+GET http://localhost:8080/health
 ```
 
 ## Example Usage
@@ -83,6 +106,22 @@ irm -Uri "http://localhost:8080/api/v1/directory/persons/search" `
 # Search for an organization by number (GET with query parameter)
 irm -Uri "http://localhost:8080/api/v1/directory/organizations/search?orgNo=123456789" `
   -Method Get
+
+# Search for a motor vehicle by license number
+irm -Uri "http://localhost:8080/api/v1/motor-vehicles/search?licenseNumber=AB12345" `
+  -Method Get
+
+# Search for a motor vehicle by VIN
+irm -Uri "http://localhost:8080/api/v1/motor-vehicles/search?vin=WBAKG7C5XBE123456" `
+  -Method Get
+
+# Search for a motor vehicle using POST
+$body = @{ licenseNumber = "AB12345" } | ConvertTo-Json
+# or $body = @{ vin = "WBAKG7C5XBE123456" } | ConvertTo-Json
+irm -Uri "http://localhost:8080/api/v1/motor-vehicles/search" `
+  -Method Post `
+  -Body $body `
+  -ContentType "application/json"
 
 # Health check
 irm -Uri "http://localhost:8080/health" -Method Get

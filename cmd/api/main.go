@@ -21,19 +21,22 @@ func main() {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
-	// Initialize Bisnode Directory client
+	// Initialize Bisnode clients
 	directoryClient := bisnodeservice.NewDirectoryClient(&cfg.Bisnode)
-	
-	// Initialize directory service
+	motorVehicleClient := bisnodeservice.NewMotorVehicleClient(&cfg.Bisnode)
+
+	// Initialize services
 	directoryService := bisnodeservice.NewDirectoryService(directoryClient)
 
-	// Initialize directory handler
+	// Initialize handlers
 	directoryHandler := handlers.NewDirectoryHandler(directoryService)
+	motorVehicleHandler := handlers.NewMotorVehicleHandler(motorVehicleClient)
 
 	// Setup router
 	mux := http.NewServeMux()
 	routes.RegisterDirectoryRoutes(mux, directoryHandler)
-	
+	routes.RegisterMotorVehicleRoutes(mux, motorVehicleHandler)
+
 	router := mux
 
 	// Create HTTP server
