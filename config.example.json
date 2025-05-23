@@ -1,0 +1,7 @@
+{
+  "bisnode": {
+    "base_url": "https://api.bisnode.no",
+    "client_id": "your_username_here",
+    "client_secret": "your_password_here"
+  }
+}

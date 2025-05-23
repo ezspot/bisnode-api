@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -34,37 +35,73 @@ func NewMotorVehicleClient(cfg *config.BisnodeConfig) *MotorVehicleClient {
 	}
 }
 
-// SearchByLicenseNumber searches for a vehicle by license number
-func (c *MotorVehicleClient) SearchByLicenseNumber(ctx context.Context, licenseNumber string) (*models.MotorVehicleSearchResponse, error) {
-	// URL encode the license number to handle special characters
-	encodedLicense := url.QueryEscape(licenseNumber)
-	url := fmt.Sprintf("%s/search/norway/motorvehicle/v2/%s", c.baseURL, encodedLicense)
+// SearchByLicenseNumber searches for a vehicle by license number or VIN
+func (c *MotorVehicleClient) SearchByLicenseNumber(ctx context.Context, searchTerm string) (*models.MotorVehicleSearchResponse, error) {
+	log.Printf("Searching for motor vehicle with search term: %s", searchTerm)
+
+	if searchTerm == "" {
+		return nil, fmt.Errorf("search term cannot be empty")
+	}
+
+	// URL encode the search term to handle special characters
+	encodedTerm := url.QueryEscape(searchTerm)
+	url := fmt.Sprintf("%s/search/norway/motorvehicle/v2/%s", c.baseURL, encodedTerm)
+	log.Printf("Sending request to: %s", url)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		err = fmt.Errorf("failed to create request: %w", err)
+		log.Printf("Error creating request: %v", err)
+		return nil, err
 	}
 
+	// Log the first 10 characters of the auth header for debugging
+	if len(c.authHeader) > 10 {
+		log.Printf("Using auth header: %s...", c.authHeader[:10])
+	} else {
+		log.Printf("Using auth header: %s", c.authHeader)
+	}
 	req.Header.Set("Authorization", c.authHeader)
 	req.Header.Set("Accept", "application/json")
 
+	log.Printf("Sending request with headers: %+v", req.Header)
+
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		err = fmt.Errorf("request failed: %w", err)
+		log.Printf("Request failed: %v", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
+	log.Printf("Received response with status: %d %s", resp.StatusCode, resp.Status)
+
+	// Read the response body
+	body, readErr := io.ReadAll(resp.Body)
+	if readErr != nil {
+		log.Printf("Error reading response body: %v", readErr)
+		return nil, fmt.Errorf("failed to read response body: %w", readErr)
+	}
+
+	// Log the response body for debugging
+	log.Printf("Response body: %s", string(body))
+
+	// Check for error status codes
 	if resp.StatusCode >= 400 {
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("API request failed with status %d: %s",
-			resp.StatusCode, string(body))
+		err = fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(body))
+		log.Printf("API error: %v", err)
+		return nil, err
 	}
 
+	// Try to unmarshal the response
 	var result models.MotorVehicleSearchResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
+	if err := json.Unmarshal(body, &result); err != nil {
+		err = fmt.Errorf("failed to decode response: %w. Response body: %s", err, string(body))
+		log.Printf("Error decoding response: %v", err)
+		return nil, err
 	}
 
+	log.Printf("Successfully retrieved motor vehicle data")
 	return &result, nil
 }
 

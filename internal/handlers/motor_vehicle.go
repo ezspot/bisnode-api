@@ -27,6 +27,9 @@ type SearchRequest struct {
 
 // Search handles the search request for a motor vehicle
 func (h *MotorVehicleHandler) Search(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
+	log.Printf("Headers: %v", r.Header)
+	
 	ctx := r.Context()
 
 	// Check if it's a GET request with query parameters
