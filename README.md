@@ -1,75 +1,82 @@
 # Bisnode API Client
 
-A Go client for interacting with the Bisnode API.
+A Go client for interacting with the Bisnode API with comprehensive Swagger/OpenAPI documentation.
 
 ## Features
 
-- Search for persons by mobile number
-- Search for organizations by organization number
-- Search for motor vehicles by license number or VIN
-- Additional features available on request for companies.
-- Swagger documentation
+- **Person Search**: Look up individuals by mobile number
+- **Organization Search**: Find organizations by organization number
+- **Vehicle Search**: Search for motor vehicles by license number or VIN
+- **Interactive Documentation**: Full API documentation with Swagger UI
+- **RESTful Endpoints**: Consistent API design following REST principles
+
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [API Documentation](#api-documentation)
+- [API Reference](#api-reference)
+  - [Authentication](#authentication)
+  - [Persons](#search-for-a-person)
+  - [Organizations](#search-for-an-organization)
+  - [Vehicles](#search-for-a-vehicle)
+  - [Health Check](#health-check)
 
 ## Prerequisites
 
 - Go 1.22 or later
 - Bisnode API credentials (username and password)
 
-## Setup
+## Quick Start
 
-1. Clone the repository:
+1. **Clone and configure**:
    ```bash
    git clone <repository-url>
    cd bisnode-directory-search
+   cp config.json.example config.json
+   # Edit config.json with your credentials
    ```
 
-2. Update the configuration:
-   - Copy `config.json.example` to `config.json`
-   - Update the `config.json` with your Bisnode API credentials
-
-3. Install dependencies:
+2. **Install dependencies**:
    ```bash
    go mod tidy
    ```
 
-## Running the Application
-
-```bash
-go run cmd/api/main.go
-```
+3. **Run the server**:
+   ```bash
+   go run cmd/api/main.go
+   ```
 
 The API will be available at `http://localhost:8080`
 
 ## API Documentation
 
-The API is documented using Swagger/OpenAPI. You can access the interactive documentation at:
+Access the interactive Swagger UI for complete API documentation:
 
 ```
 http://localhost:8080/swagger/index.html
 ```
 
-## API Endpoints
-
-All endpoints are prefixed with `/api/v1`.
+## API Reference
 
 ### Authentication
 
-All endpoints require Basic Authentication. Include your credentials in the `Authorization` header:
+All endpoints require Basic Authentication. Include the `Authorization` header in your requests:
 
-```
+```http
 Authorization: Basic <base64-encoded-username:password>
 ```
 
-### Search for a Person by Mobile Number
+### Search for a Person
 
-#### GET Request
+#### By Mobile Number (GET)
 ```http
-GET http://localhost:8080/api/v1/directory/persons/search?mobileNumber=12345678
+GET /api/v1/directory/persons/search?mobileNumber=12345678
 ```
 
-#### POST Request
+#### By Mobile Number (POST)
 ```http
-POST http://localhost:8080/api/v1/directory/persons/search
+POST /api/v1/directory/persons/search
 Content-Type: application/json
 
 {
@@ -77,16 +84,16 @@ Content-Type: application/json
 }
 ```
 
-### Search for an Organization by Number
+### Search for an Organization
 
-#### GET Request
+#### By Organization Number (GET)
 ```http
-GET http://localhost:8080/api/v1/directory/organizations/search?organizationNumber=123456789
+GET /api/v1/directory/organizations/search?organizationNumber=123456789
 ```
 
-#### POST Request
+#### By Organization Number (POST)
 ```http
-POST http://localhost:8080/api/v1/directory/organizations/search
+POST /api/v1/directory/organizations/search
 Content-Type: application/json
 
 {
@@ -96,17 +103,17 @@ Content-Type: application/json
 
 ### Search for a Motor Vehicle
 
-#### GET Request (License Number)
+Search by license number (GET):
 ```http
 GET http://localhost:8080/api/v1/motor-vehicles/search?licenseNumber=AB12345
 ```
 
-#### GET Request (VIN)
+Search by VIN (GET):
 ```http
 GET http://localhost:8080/api/v1/motor-vehicles/search?vin=WBAKG7C5XBE123456
 ```
 
-#### POST Request (JSON Body)
+Search using POST with JSON body:
 ```http
 POST http://localhost:8080/api/v1/motor-vehicles/search
 Content-Type: application/json
@@ -120,8 +127,10 @@ Content-Type: application/json
 ### Health Check
 
 ```http
-GET http://localhost:8080/health
+GET /health
 ```
+
+Returns `200 OK` when the service is running.
 
 ## Example Usage
 
@@ -232,31 +241,6 @@ Or use environment variables:
 - `BISNODE_CLIENT_SECRET`
 
 Note: Ensure your account has access to the specific Bisnode API services you intend to use.
-
-## Usage Examples
-
-### Search for a Motor Vehicle
-
-Search by license number (GET):
-```http
-GET http://localhost:8080/api/v1/motor-vehicles/search?licenseNumber=AB12345
-```
-
-Search by VIN (GET):
-```http
-GET http://localhost:8080/api/v1/motor-vehicles/search?vin=WBAKG7C5XBE123456
-```
-
-Search using POST with JSON body:
-```http
-POST http://localhost:8080/api/v1/motor-vehicles/search
-Content-Type: application/json
-
-{
-  "licenseNumber": "AB12345"
-  // or "vin": "WBAKG7C5XBE123456"
-}
-```
 
 ### Additional Features
 
