@@ -244,7 +244,7 @@ Note: Ensure your account has access to the specific Bisnode API services you in
 
 ### Additional Features
 
-Other Bisnode API endpoints can be implemented on request. Please contact support for more information.
+Other Bisnode API endpoints can be implemented on request. Please contact the author for more information.
 
 ## API Documentation
 
