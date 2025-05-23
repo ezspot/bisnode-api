@@ -17,7 +17,3 @@ foreach ($dir in $directories) {
         Write-Host "Created directory: $fullPath"
     }
 }
-
-# Initialize Go module
-go mod init github.com/yourusername/bisnode-person-search
-go mod tidy
