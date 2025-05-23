@@ -70,41 +70,75 @@ GET /health
 
 ## Example Usage
 
-### Using cURL
-
-```bash
-# Search person by mobile number
-curl -X POST http://localhost:8080/api/v1/directory/persons/search \
-  -H "Content-Type: application/json" \
-  -d '{"mobileNumber":"12345678"}'
-
-# Search organization by number (query param)
-curl -X GET "http://localhost:8080/api/v1/directory/organizations/search?orgNo=123456789"
-
-# Search organization by number (JSON body)
-curl -X POST http://localhost:8080/api/v1/directory/organizations/search \
-  -H "Content-Type: application/json" \
-  -d '{"organizationNumber":"123456789"}'
-```
-
-### Using PowerShell
+### Using PowerShell (Recommended)
 
 ```powershell
-# Search person by mobile number
+# Search for a person by mobile number (POST with JSON body)
+$body = @{ mobileNumber = "12345678" } | ConvertTo-Json
 irm -Uri "http://localhost:8080/api/v1/directory/persons/search" `
   -Method Post `
-  -Body '{"mobileNumber":"12345678"}' `
+  -Body $body `
   -ContentType "application/json"
 
-# Search organization by number (query param)
+# Search for an organization by number (GET with query parameter)
 irm -Uri "http://localhost:8080/api/v1/directory/organizations/search?orgNo=123456789" `
   -Method Get
 
-# Search organization by number (JSON body)
-irm -Uri "http://localhost:8080/api/v1/directory/organizations/search" `
-  -Method Post `
-  -Body '{"organizationNumber":"123456789"}' `
-  -ContentType "application/json"
+# Health check
+irm -Uri "http://localhost:8080/health" -Method Get
+```
+
+### Using cURL (if installed)
+
+```bash
+# Search for a person by mobile number
+$body='{"mobileNumber":"12345678"}'
+curl -X POST http://localhost:8080/api/v1/directory/persons/search \
+  -H "Content-Type: application/json" \
+  -d $body
+
+# Search for an organization by number
+curl -X GET "http://localhost:8080/api/v1/directory/organizations/search?orgNo=123456789"
+
+# Health check
+curl -X GET http://localhost:8080/health
+```
+
+## Response Format
+
+### Person Search Response
+```json
+{
+  "type": "Person",
+  "organizationnumber": "931698400",
+  "lastname": "Doe",
+  "firstname": "John",
+  "streetname": "Example Street",
+  "houseno": "123",
+  "zipcode": "1234",
+  "city": "Oslo"
+}
+```
+
+### Organization Search Response
+```json
+{
+  "type": "Company",
+  "organizationnumber": "123456789",
+  "lastname": "Example Company AS",
+  "streetname": "Business Street",
+  "houseno": "456",
+  "zipcode": "1234",
+  "city": "Oslo"
+}
+```
+
+### Error Response
+```json
+{
+  "error": "Not Found",
+  "message": "No results found"
+}
 ```
 
 ## Configuration
